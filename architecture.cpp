@@ -3,6 +3,7 @@ using namespace std;
 
 void resolver(int n, int h, int H){
   //do something
+  int b = 2;
   cout << "resolvido";
 }
 
