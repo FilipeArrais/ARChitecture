@@ -96,12 +96,21 @@ long contar_arco(int num_blocos, int altura_bloco, int altura_parede){
             }
         }
 
-        for(it = lista_alturas_ant_subir.begin(); it != lista_alturas_ant_subir.end(); it++){
+       for(it = lista_alturas_ant_subir.begin(); it != lista_alturas_ant_subir.end(); it++){
             altura_atual = it -> first;
+            int j = -1;
 
+            if((altura_atual + j <= 0) || ((altura_atual + j - (num_blocos - i - 1)) <= 0)){}
+
+            else if((altura_atual + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))){}
+
+            //valido
+            else
+                atualizar_map(lista_alturas_ant_subir, lista_alturas_atual_descer, altura_atual, j);
+                
             //fazer todas as combinacoes possiveis
             //descer
-            for(int j = -1; j > -altura_bloco; j--){
+            for(j = -2; j > -altura_bloco; j--){
                 if((altura_atual + j <= 0) || ((altura_atual + j - (num_blocos - i - 1)) <= 0)){
                     break;
                 }
