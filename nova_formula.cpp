@@ -8,153 +8,144 @@ using namespace std;
 #define MOD 1000000007
 
 int mod_abs(int a) {
- return ((a % MOD) + MOD) % MOD;
+    return ((a % MOD) + MOD) % MOD;
 }
 
-void atualizar_map(std::map<int, int> &atual, int soma, int nova_altura, int altura_bloco, long &num_combinacoes){
-    map <int, int>:: iterator it = atual.find(nova_altura);
-    
-    if(it != atual.end())
-        atual[nova_altura] = soma + it->second;
-    
-    else
-        atual[nova_altura] = soma;
+int mod_add(int a, int b) {
+    return (mod_abs(a) + mod_abs(b)) % MOD;
+}
+
+void atualizar_memoria(int &atual, int soma, int nova_altura, int altura_bloco, int &num_combinacoes){
+    atual = mod_add(atual, soma);
 
     //novas solucões
     if(nova_altura < altura_bloco)
-        num_combinacoes += soma;
+        num_combinacoes = mod_add(num_combinacoes, soma);
 }
 
-long contar_arco(int num_blocos, int altura_bloco, int altura_parede){
+int get_altura_max(int num_blocos, int altura_bloco, int altura_parede){
+    
+    int temp = num_blocos * (altura_bloco - 1);
+    if(temp < altura_parede)
+        return temp;
+
+    return altura_parede;    
+}
+
+int contar_arco(int num_blocos, int altura_bloco, int altura_parede){
+    altura_parede = get_altura_max(num_blocos, altura_bloco, altura_parede - altura_bloco);
+
     //memoria sobre as iterações anteriores
-    std::map <int, map <int, int> > memoria_alturas_subir;
-    std::map <int, map <int, int> > memoria_alturas_descer;
+    std::vector <vector <int> > memoria_alturas_subir (altura_parede + 1, vector<int>(num_blocos));
+    std::vector <vector <int> > memoria_alturas_descer (altura_parede + 1, vector<int>(num_blocos));
 
     //variaveis auxiliares  
-    std::map <int, int>:: iterator it;
-    std::map <int, int>:: reverse_iterator rit;  
-    int altura_atual, i = 0;
-    long num_combinacoes = 0;
-
+    int i = 0, num_combinacoes = 0;
     //primeiro bloco
-    std::map <int, int> lista_alturas = map <int, int>();
     
     //iterar os casos possiveis
     for(i = 1; i < altura_bloco; i++){
 
         //nao ultrapassou a altura maxima
-        if(i <= altura_parede)
-            lista_alturas[i] = 1;
-
+        if(i <= altura_parede){
+            memoria_alturas_subir[i][0] = 1;
+            num_combinacoes++;
+        }
         //altura ultrapassada
         else
             break;
     }
 
-    num_combinacoes += lista_alturas.size();
-
-    memoria_alturas_subir[0] = lista_alturas;
-    memoria_alturas_descer[0] = std::map <int, int>();
-
     //blocos restantes
-    for(i = 1; i < num_blocos; i++){
-        //lista anterior de alturas
-        std::map <int, int> lista_alturas_ant_subir = memoria_alturas_subir[i - 1];
-        std::map <int, int> lista_alturas_ant_descer = memoria_alturas_descer[i - 1];
-        
-        //inicializar lista atual de alturas
-        std::map <int, int> lista_alturas_atual_subir = std:: map <int, int>();
-        std::map <int, int> lista_alturas_atual_descer = std:: map <int, int>();
-
+    for(i = 1; i < num_blocos; i++){ 
         //iterar nas alturas anteriores
-        for(it = lista_alturas_ant_subir.begin(); it != lista_alturas_ant_subir.end(); it++){
-            altura_atual = it->first;
+        for(int k = 1; k <= get_altura_max(i, altura_bloco, altura_parede); k++){
+            if(memoria_alturas_subir[k][i - 1] != 0){
+                int j = 1;
 
-            //testar o primeiro, caso seja invalido nao vale a pena testar os outros
-            if((altura_atual + 1 > altura_parede) || ((altura_atual + 1 - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))))
-                break;
-            
-            //valido
-            else
-                atualizar_map(lista_alturas_atual_subir, it->second, altura_atual + 1, altura_bloco, num_combinacoes);
-                
-            //fazer todas as combinacoes possiveis
-            //subir
-            for(int j = 2; j < altura_bloco; j++){
-                if((altura_atual + j > altura_parede) || ((altura_atual + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))))
+                //testar o primeiro, caso seja invalido nao vale a pena testar os outros
+                if((k + j > altura_parede) || ((k + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))))
                     break;
-                
+
                 //valido
                 else
-                    atualizar_map(lista_alturas_atual_subir, it->second, altura_atual + j, altura_bloco, num_combinacoes);
+                    atualizar_memoria(memoria_alturas_subir[k + j][i], memoria_alturas_subir[k][i - 1], k + 1, altura_bloco, num_combinacoes);
+
+                //fazer todas as combinacoes possiveis
+                //subir
+                for(j = 2; j < altura_bloco; j++){
+
+                    if((k + j > altura_parede) || ((k + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))))
+                        break;
+                    
+                    //valido
+                    else
+                        atualizar_memoria(memoria_alturas_subir[k + j][i], memoria_alturas_subir[k][i - 1], k + j, altura_bloco, num_combinacoes);
+                }
             }
         }
 
-        for(rit = lista_alturas_ant_subir.rbegin(); rit != lista_alturas_ant_subir.rend(); rit++){
-            altura_atual = rit -> first;
-            int j = -1;
+        for(int k = get_altura_max(i, altura_bloco, altura_parede); k >= 1; k--){
+            if(memoria_alturas_subir[k][i - 1] != 0){
+                int j = -1;
 
-            if(altura_atual + j <= 0){
-                break;
-            }
-
-            else if((altura_atual + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))){}
-
-            //valido
-            else
-                atualizar_map(lista_alturas_atual_descer, rit->second, altura_atual + j, altura_bloco, num_combinacoes);
-                
-            //fazer todas as combinacoes possiveis
-            //descer
-            for(j = -2; j > -altura_bloco; j--){
-                if(altura_atual + j <= 0){
+                if(k + j <= 0){
                     break;
                 }
 
-                else if((altura_atual + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))){}
+                else if((k + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))){}
 
                 //valido
                 else
-                    atualizar_map(lista_alturas_atual_descer, rit->second, altura_atual + j, altura_bloco, num_combinacoes);
+                    atualizar_memoria(memoria_alturas_descer[k + j][i], memoria_alturas_subir[k][i - 1], k + j, altura_bloco, num_combinacoes); 
+
+                //fazer todas as combinacoes possiveis
+                //descer
+                for(j = -2; j > -altura_bloco; j--){
+                    if(k + j <= 0){
+                        break;
+                    }
+
+                    else if((k + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))){}
+
+                    //valido
+                    else
+                        atualizar_memoria(memoria_alturas_descer[k + j][i], memoria_alturas_subir[k][i - 1], k + j, altura_bloco, num_combinacoes);
+                }
             }
         }
 
         //iterar nas alturas anteriores
-        for(rit = lista_alturas_ant_descer.rbegin(); rit != lista_alturas_ant_descer.rend(); rit++){
-            altura_atual = rit -> first;
-            int j = -1;
+        for(int k = get_altura_max(i, altura_bloco, altura_parede); k >= 1; k--){
+           if(memoria_alturas_descer[k][i - 1] != 0){
+                int j = -1;
 
-            if(altura_atual + j <= 0){
-                break;
-            }
-
-            else if((altura_atual + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))){}
-
-            //valido
-            else
-                atualizar_map(lista_alturas_atual_descer, rit->second, altura_atual + j, altura_bloco, num_combinacoes);
-
-            //fazer todas as combinacoes possiveis
-            //descer
-            for(int j = -2; j > -altura_bloco; j--){
-                if(altura_atual + j <= 0){
+                if(k + j <= 0){
                     break;
                 }
-                
-                else if((altura_atual + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))){}
+
+                else if((k + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))){}
 
                 //valido
                 else
-                    atualizar_map(lista_alturas_atual_descer, rit->second, altura_atual + j, altura_bloco, num_combinacoes);
+                    atualizar_memoria(memoria_alturas_descer[k + j][i], memoria_alturas_descer[k][i - 1], k + j, altura_bloco, num_combinacoes);
+
+                //fazer todas as combinacoes possiveis
+                //descer
+                for(int j = -2; j > -altura_bloco; j--){
+                    if(k + j <= 0){
+                        break;
+                    }
+                    
+                    else if((k + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))){}
+
+                    //valido
+                    else
+                        atualizar_memoria(memoria_alturas_descer[k + j][i], memoria_alturas_descer[k][i - 1], k + j, altura_bloco, num_combinacoes);
+                }
             }
         }
-
-        //atualizar memoria
-        memoria_alturas_subir[i] = lista_alturas_atual_subir;
-        memoria_alturas_descer[i] = lista_alturas_atual_descer;
     }
-
-    i--;
 
     return num_combinacoes;
 }
@@ -168,7 +159,7 @@ int main() {
     if(num_blocos < 3)
       cout << "0\n"; 
     else
-      cout << mod_abs(contar_arco(num_blocos - 2, altura_bloco, altura_parede - altura_bloco)) << "\n";
+      cout << contar_arco(num_blocos - 2, altura_bloco, altura_parede) << "\n";
   }
 
   return 0;
