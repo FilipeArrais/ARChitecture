@@ -141,16 +141,20 @@ int contar_arco(int num_blocos, int altura_bloco, int altura_parede){
 }
 
 int main() {
-  int num_casos, num_blocos, altura_bloco, altura_parede;
-  cin >> num_casos;
+    
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
 
-  for(int _ = 0; _ < num_casos; _++){
-    cin >> num_blocos >> altura_bloco >> altura_parede;
-    if(num_blocos < 3)
-      cout << "0\n"; 
-    else
-      cout << contar_arco(num_blocos - 2, altura_bloco, altura_parede) << "\n";
-  }
+    int num_casos, num_blocos, altura_bloco, altura_parede;
+    cin >> num_casos;
 
-  return 0;
+    for(int _ = 0; _ < num_casos; _++){
+        cin >> num_blocos >> altura_bloco >> altura_parede;
+        if(num_blocos < 3)
+            cout << "0\n"; 
+        else
+            cout << contar_arco(num_blocos - 2, altura_bloco, altura_parede) << "\n";
+    }
+
+    return 0;
 }
