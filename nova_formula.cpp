@@ -32,8 +32,17 @@ int get_altura_max(int num_blocos, int altura_bloco, int altura_parede){
     return altura_parede;    
 }
 
+int get_largura_max(int num_blocos,int altura_parede){
+
+    if(num_blocos > altura_parede * 2 ){
+        return altura_parede*2;
+    }
+
+    return num_blocos;
+}
 int contar_arco(int num_blocos, int altura_bloco, int altura_parede){
     altura_parede = get_altura_max(num_blocos, altura_bloco, altura_parede - altura_bloco);
+    num_blocos = get_largura_max(num_blocos,altura_parede);
 
     //memoria sobre as iterações anteriores
     std::vector <vector <int> > memoria_alturas_subir (altura_parede + 1, vector<int>(num_blocos));
