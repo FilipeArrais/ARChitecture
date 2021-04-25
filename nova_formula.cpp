@@ -99,8 +99,6 @@ int contar_arco(int num_blocos, int altura_bloco, int altura_parede){
                 if(k + j <= 0)
                     break;
 
-                else if((k + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))){}
-
                 //valido
                 atualizar_memoria(memoria_alturas_descer[k + j][i], memoria_alturas_subir[k][i - 1], k + j, altura_bloco, num_combinacoes); 
 
@@ -109,8 +107,6 @@ int contar_arco(int num_blocos, int altura_bloco, int altura_parede){
                 for(j = -2; j > -altura_bloco; j--){
                     if(k + j <= 0)
                         break;
-
-                    else if((k + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))){}
 
                     //valido
                     atualizar_memoria(memoria_alturas_descer[k + j][i], memoria_alturas_subir[k][i - 1], k + j, altura_bloco, num_combinacoes);
@@ -126,8 +122,6 @@ int contar_arco(int num_blocos, int altura_bloco, int altura_parede){
                 if(k + j <= 0)
                     break;
 
-                else if((k + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))){}
-
                 //valido
                 atualizar_memoria(memoria_alturas_descer[k + j][i], memoria_alturas_descer[k][i - 1], k + j, altura_bloco, num_combinacoes);
 
@@ -137,8 +131,6 @@ int contar_arco(int num_blocos, int altura_bloco, int altura_parede){
                     if(k + j <= 0)
                         break;
                     
-                    else if((k + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))){}
-
                     //valido
                     atualizar_memoria(memoria_alturas_descer[k + j][i], memoria_alturas_descer[k][i - 1], k + j, altura_bloco, num_combinacoes);
                 }
