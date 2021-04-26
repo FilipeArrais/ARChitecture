@@ -1,4 +1,4 @@
-//g++ -std=c++17 -Wall -Wextra -O2 "nova_formula.cpp" -lm
+//g++ -std=c++17 -Wall -Wextra -O2 "architecture.cpp" -lm
 #include <iostream>
 #include <map>
 #include <set>
@@ -26,7 +26,6 @@ void atualizar_memoria(int &atual, int soma, int nova_altura, int altura_bloco, 
     if(nova_altura < altura_bloco)
         num_combinacoes = mod_add(num_combinacoes, soma);
     
-
 }
 
 int get_altura_max(int num_blocos, int altura_bloco, int altura_parede){
@@ -75,69 +74,43 @@ int contar_arco(int num_blocos, int altura_bloco, int altura_parede){
 
     //blocos restantes
     for(i = 1; i < num_blocos; i++){ 
-        //iterar nas alturas anteriores
         int soma = 0;
+
+        //iterar nas alturas anteriores
         for(int k = 1; k <= get_altura_max(i + 1, altura_bloco, altura_parede); k++){
-            int j = 1;
+
             //testar o primeiro, caso seja invalido nao vale a pena testar os outros
-            if((k + j > altura_parede) || ((k + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))))
+            if((k + 1 > altura_parede) || ((k + 1 - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))))
                 break;
 
             if(k  + 1 < altura_bloco){
                 soma = mod_add(soma, memoria_alturas_subir[k][i - 1]);
-                memoria_alturas_subir[k + j][i] = soma;
                 num_combinacoes = mod_add(num_combinacoes, soma);
-                //atualizar_memoria(memoria_alturas_subir[k + j][i], soma, k + 1, altura_bloco, num_combinacoes);
             }
+            else
+                soma = mod_add(soma, mod_sub(memoria_alturas_subir[k][i - 1], memoria_alturas_subir[k - (altura_bloco - 1) ][i - 1]));
+
+            memoria_alturas_subir[k + 1][i] = soma;                
+        }
+
+        soma = 0;
+        int altura = get_altura_max(i + 1, altura_bloco, altura_parede);
+        
+        for(int k = altura; k > 1; k--){
+            if(altura - k < altura_bloco - 1){
+                soma = mod_add(soma, memoria_alturas_subir[k][i - 1]);
+                soma = mod_add(soma, memoria_alturas_descer[k][i - 1]);
+            }    
             else{
-                soma = mod_add(soma,mod_sub(memoria_alturas_subir[k][i - 1],memoria_alturas_subir[k - (altura_bloco - 1) ][i - 1]));
-                memoria_alturas_subir[k + j][i] = soma;
-            }                
-        }
-
-        for(int k = get_altura_max(i, altura_bloco, altura_parede); k >= 1; k--){
-            if(memoria_alturas_subir[k][i - 1] != 0){
-                int j = -1;
-
-                if(k + j <= 0)
-                    break;
-
-                //valido
-                atualizar_memoria(memoria_alturas_descer[k + j][i], memoria_alturas_subir[k][i - 1], k + j, altura_bloco, num_combinacoes); 
-
-                //fazer todas as combinacoes possiveis
-                //descer
-                for(j = -2; j > -altura_bloco; j--){
-                    if(k + j <= 0)
-                        break;
-
-                    //valido
-                    atualizar_memoria(memoria_alturas_descer[k + j][i], memoria_alturas_subir[k][i - 1], k + j, altura_bloco, num_combinacoes);
-                }
+                soma = mod_add(soma, mod_sub(memoria_alturas_subir[k][i - 1], memoria_alturas_subir[k + (altura_bloco - 1) ][i - 1]));
+                soma = mod_add(soma, mod_sub(memoria_alturas_descer[k][i - 1], memoria_alturas_descer[k + (altura_bloco - 1) ][i - 1]));
             }
-        }
+            
+            memoria_alturas_descer[k - 1][i] = soma;
 
-        //iterar nas alturas anteriores
-        for(int k = get_altura_max(i, altura_bloco, altura_parede); k >= 1; k--){
-           if(memoria_alturas_descer[k][i - 1] != 0){
-                int j = -1;
-
-                if(k + j <= 0)
-                    break;
-
-                //valido
-                atualizar_memoria(memoria_alturas_descer[k + j][i], memoria_alturas_descer[k][i - 1], k + j, altura_bloco, num_combinacoes);
-
-                //fazer todas as combinacoes possiveis
-                //descer
-                for(int j = -2; j > -altura_bloco; j--){
-                    if(k + j <= 0)
-                        break;
-                    
-                    //valido
-                    atualizar_memoria(memoria_alturas_descer[k + j][i], memoria_alturas_descer[k][i - 1], k + j, altura_bloco, num_combinacoes);
-                }
-            }
+            if(k - 1 < altura_bloco)
+                num_combinacoes = mod_add(num_combinacoes, soma);
+        
         }
     }
 
