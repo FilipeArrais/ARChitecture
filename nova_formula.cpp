@@ -15,12 +15,18 @@ int mod_add(int a, int b) {
     return (mod_abs(a) + mod_abs(b)) % MOD;
 }
 
+int mod_sub(int a, int b) {
+  return mod_add(a, -b);
+}
+
 void atualizar_memoria(int &atual, int soma, int nova_altura, int altura_bloco, int &num_combinacoes){
     atual = mod_add(atual, soma);
 
     //novas solucões
     if(nova_altura < altura_bloco)
         num_combinacoes = mod_add(num_combinacoes, soma);
+    
+
 }
 
 int get_altura_max(int num_blocos, int altura_bloco, int altura_parede){
@@ -61,35 +67,32 @@ int contar_arco(int num_blocos, int altura_bloco, int altura_parede){
             num_combinacoes++;
         }
         //altura ultrapassada
-        else
+        else{
             break;
+        }
+            
     }
 
     //blocos restantes
     for(i = 1; i < num_blocos; i++){ 
         //iterar nas alturas anteriores
-        for(int k = 1; k <= get_altura_max(i, altura_bloco, altura_parede); k++){
-            if(memoria_alturas_subir[k][i - 1] != 0){
-                int j = 1;
+        int soma = 0;
+        for(int k = 1; k <= get_altura_max(i + 1, altura_bloco, altura_parede); k++){
+            int j = 1;
+            //testar o primeiro, caso seja invalido nao vale a pena testar os outros
+            if((k + j > altura_parede) || ((k + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))))
+                break;
 
-                //testar o primeiro, caso seja invalido nao vale a pena testar os outros
-                if((k + j > altura_parede) || ((k + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))))
-                    break;
-
-                //valido
-                atualizar_memoria(memoria_alturas_subir[k + j][i], memoria_alturas_subir[k][i - 1], k + 1, altura_bloco, num_combinacoes);
-
-                //fazer todas as combinacoes possiveis
-                //subir
-                for(j = 2; j < altura_bloco; j++){
-
-                    if((k + j > altura_parede) || ((k + j - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))))
-                        break;
-                    
-                    //valido
-                    atualizar_memoria(memoria_alturas_subir[k + j][i], memoria_alturas_subir[k][i - 1], k + j, altura_bloco, num_combinacoes);
-                }
+            if(k  + 1 < altura_bloco){
+                soma = mod_add(soma, memoria_alturas_subir[k][i - 1]);
+                memoria_alturas_subir[k + j][i] = soma;
+                num_combinacoes = mod_add(num_combinacoes, soma);
+                //atualizar_memoria(memoria_alturas_subir[k + j][i], soma, k + 1, altura_bloco, num_combinacoes);
             }
+            else{
+                soma = mod_add(soma,mod_sub(memoria_alturas_subir[k][i - 1],memoria_alturas_subir[k - (altura_bloco - 1) ][i - 1]));
+                memoria_alturas_subir[k + j][i] = soma;
+            }                
         }
 
         for(int k = get_altura_max(i, altura_bloco, altura_parede); k >= 1; k--){
