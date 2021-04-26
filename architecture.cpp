@@ -19,15 +19,6 @@ int mod_sub(int a, int b) {
   return mod_add(a, -b);
 }
 
-void atualizar_memoria(int &atual, int soma, int nova_altura, int altura_bloco, int &num_combinacoes){
-    atual = mod_add(atual, soma);
-
-    //novas solucões
-    if(nova_altura < altura_bloco)
-        num_combinacoes = mod_add(num_combinacoes, soma);
-    
-}
-
 int get_altura_max(int num_blocos, int altura_bloco, int altura_parede){
     
     int temp = num_blocos * (altura_bloco - 1);
@@ -45,19 +36,19 @@ int get_largura_max(int num_blocos,int altura_parede){
 
     return num_blocos;
 }
+
 int contar_arco(int num_blocos, int altura_bloco, int altura_parede){
     altura_parede = get_altura_max(num_blocos, altura_bloco, altura_parede - altura_bloco);
-    num_blocos = get_largura_max(num_blocos,altura_parede);
+    num_blocos = get_largura_max(num_blocos, altura_parede);
 
     //memoria sobre as iterações anteriores
     std::vector <vector <int> > memoria_alturas_subir (altura_parede + 1, vector<int>(num_blocos));
     std::vector <vector <int> > memoria_alturas_descer (altura_parede + 1, vector<int>(num_blocos));
 
     //variaveis auxiliares  
-    int i = 0, num_combinacoes = 0;
+    int i = 0, altura, soma, num_combinacoes = 0;
     //primeiro bloco
     
-    //iterar os casos possiveis
     for(i = 1; i < altura_bloco; i++){
 
         //nao ultrapassou a altura maxima
@@ -74,7 +65,7 @@ int contar_arco(int num_blocos, int altura_bloco, int altura_parede){
 
     //blocos restantes
     for(i = 1; i < num_blocos; i++){ 
-        int soma = 0;
+        soma = 0;
 
         //iterar nas alturas anteriores
         for(int k = 1; k <= get_altura_max(i + 1, altura_bloco, altura_parede); k++){
@@ -94,7 +85,7 @@ int contar_arco(int num_blocos, int altura_bloco, int altura_parede){
         }
 
         soma = 0;
-        int altura = get_altura_max(i + 1, altura_bloco, altura_parede);
+        altura = get_altura_max(i + 1, altura_bloco, altura_parede);
         
         for(int k = altura; k > 1; k--){
             if(altura - k < altura_bloco - 1){
