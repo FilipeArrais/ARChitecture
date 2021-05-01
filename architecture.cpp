@@ -66,9 +66,10 @@ int contar_arco(int num_blocos, int altura_bloco, int altura_parede){
     //blocos restantes
     for(i = 1; i < num_blocos; i++){ 
         soma = 0;
+        altura = get_altura_max(i + 1, altura_bloco, altura_parede);
 
         //iterar nas alturas anteriores
-        for(int k = 1; k <= get_altura_max(i + 1, altura_bloco, altura_parede); k++){
+        for(int k = 1; k <= altura; k++){
 
             //testar o primeiro, caso seja invalido nao vale a pena testar os outros
             if((k + 1 > altura_parede) || ((k + 1 - (altura_bloco - 1)) > ((num_blocos - i - 1) * (altura_bloco - 1))))
@@ -85,7 +86,6 @@ int contar_arco(int num_blocos, int altura_bloco, int altura_parede){
         }
 
         soma = 0;
-        altura = get_altura_max(i + 1, altura_bloco, altura_parede);
         
         for(int k = altura; k > 1; k--){
             if(altura - k < altura_bloco - 1){
